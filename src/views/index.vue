@@ -3,6 +3,12 @@
   <div class="pd10">
     <div class="pd10 alignl">
       <Form ref="formInline" inline :label-width="100">
+        <FormItem label="是否全选">
+          <i-switch size="large" v-model="selectAll" @on-change="refresh">
+            <span slot="open">是</span>
+            <span slot="close">否</span>
+          </i-switch>
+        </FormItem>
         <FormItem label="是否只读">
           <i-switch size="large" v-model="readonly" @on-change="refresh">
             <span slot="open">是</span>
@@ -22,6 +28,7 @@
     </div>
     <iview-tree-table
       v-if="isRefresh"
+      :selectAll="selectAll"
       :readonly="readonly"
       :children="dataList"
       :selectedList="initSelected"
@@ -29,6 +36,9 @@
       :expandLevel="expandLevel"
       @on-checked-keys-change="handleCheckedKeysChange"
     ></iview-tree-table>
+    <div>
+      选择的id: {{selectMenuSet}}
+    </div>
   </div>
 </template>
 <script>
@@ -41,13 +51,16 @@ export default {
   },
   data() {
     return {
+      selectAll: false,
       isRefresh: true,
       readonly: false,
       expandAll: false,
       expandLevel: 0,
       dataList: [],
       // 初始化选中的菜单和按钮id
-      initSelected: [1077, 749, 10000]
+      initSelected: [20000],
+
+      selectMenuSet: [20000],
     };
   },
   created() {
@@ -65,6 +78,9 @@ export default {
       this.expandAll = false;
       this.refresh();
     },
+    changeInit(val) {
+      console.log(val)
+    },
     /**
      * 按钮选中后触发该事件
      * dataList: 绑定的数据源
@@ -73,6 +89,7 @@ export default {
     handleCheckedKeysChange(dataList, menuSet) {
       console.log(dataList);
       console.log(menuSet);
+      this.selectMenuSet = [...menuSet]
     }
   }
 };

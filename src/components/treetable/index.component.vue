@@ -18,6 +18,10 @@ export default {
     TreeTable
   },
   props: {
+    selectAll: {
+      type: Boolean,
+      default: false
+    },
     // 是否只读
     readonly: {
       type: Boolean,
@@ -61,7 +65,7 @@ export default {
   methods: {
     // 检验_checked是否选中
     isChecked(id) {
-      return this.selectedSet && this.selectedSet.has(id);
+      return (this.selectedSet && this.selectedSet.has(id)) || this.selectAll;
     },
     // 处理数据
     formateData(dataList = [], level = 1) {
@@ -130,16 +134,19 @@ export default {
       }
       // 将子页面和子按钮放在一个数组中
       let children = row._pageList.concat(row._actionList);
-      if (row._checked) {
-        this.menuSet.add(row.id);
-      }
+      
 
       // 无子页面 和 无子按钮
-      if (!children.length) return;
+      if (!children.length) {
+        if (row._checked) {
+          this.menuSet.add(row.id);
+        }
+        return
+      };
 
-      let hasChildrenChecked = _.some(children, { _checked: true });
-      let hasChildrenUnChecked = _.some(children, { _checked: false });
-      let hasChildrenIndeterminate = _.some(children, { _indeterminate: true });
+      let hasChildrenChecked = children.some((obj)=>  obj._checked);
+      let hasChildrenUnChecked = children.some((obj)=>  !obj._checked);
+      let hasChildrenIndeterminate = children.some((obj)=>  obj._indeterminate);
 
       // 子页面和子按钮 全选中
       if (
@@ -165,6 +172,7 @@ export default {
             this.menuSet.add(item.id);
           }
         });
+        this.menuSet.add(row.id);
       }
     }
   }

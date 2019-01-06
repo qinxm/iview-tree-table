@@ -1,4 +1,7 @@
 # iview-tree-table
+```
+基于iview 组件库的table实现的树级table, 可用于权限控制页面的菜单和按钮选择。
+```
 
 ## Project setup
 ```
@@ -58,8 +61,6 @@ methods: {
       console.log(menuSet)
     }
 }
-  
-
-数据源： 
+   
 
 ```
