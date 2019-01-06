@@ -60,6 +60,7 @@ export default {
         "dataList",
         this.resetDataList(this.formateData(this.children))
       );
+      this.$emit("on-checked-keys-change", this.dataList, this.menuSet);
     }
   },
   methods: {

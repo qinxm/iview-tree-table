@@ -26,8 +26,11 @@
         </FormItem>
       </Form>
     </div>
+    <div>
+      选择的id: {{selectMenuSet}}
+    </div>
     <iview-tree-table
-      v-if="isRefresh"
+      v-if="show"
       :selectAll="selectAll"
       :readonly="readonly"
       :children="dataList"
@@ -36,9 +39,7 @@
       :expandLevel="expandLevel"
       @on-checked-keys-change="handleCheckedKeysChange"
     ></iview-tree-table>
-    <div>
-      选择的id: {{selectMenuSet}}
-    </div>
+    
   </div>
 </template>
 <script>
@@ -52,7 +53,7 @@ export default {
   data() {
     return {
       selectAll: false,
-      isRefresh: true,
+      show: true,
       readonly: false,
       expandAll: false,
       expandLevel: 0,
@@ -68,9 +69,9 @@ export default {
   },
   methods: {
     refresh() {
-      this.isRefresh = false;
+      this.show = false;
       this.$nextTick(() => {
-        this.isRefresh = true;
+        this.show = true;
       });
     },
     changLevel(val) {
