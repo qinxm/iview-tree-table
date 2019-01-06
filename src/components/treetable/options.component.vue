@@ -1,18 +1,17 @@
 <template>
   <div class="role-options">
     <div class="role-options-options">
-      <CheckboxGroup v-model="copyCheckedChildren" @on-change="changeOptionsChecked()">
-        <Checkbox
-          v-for="item in copyActionList"
-          :key="item.id"
-          class="role-checkbox"
-          :label="item.id"
-          :style="{pointerEvents: pointEvent}"
-        >
-          <span>{{item.name}}</span>
-        </Checkbox>
-      </CheckboxGroup>
-      
+      <Checkbox
+        v-for="item in actionList"
+        :key="item.id"
+        class="role-checkbox"
+        :label="item.id"
+        :value="item._checked"
+        @on-change="handleOnChange($event, item)" 
+        :style="{pointerEvents: pointEvent}"
+      >
+        <span>{{item.name}}</span>
+      </Checkbox>
     </div>
   </div>
 </template>
@@ -20,29 +19,20 @@
 export default {
   name: "OptionsNode",
   props: {
+    // 按钮列表
     actionList: Array,
-    checkedChildren: Array,
-    disabled: false
+    // 是否只读
+    readonly: false
   },
   data() {
     return {
-      pointEvent: this.disabled ? 'none' : 'inherit',
-      _checkAll: false,
-      indeterminate: false,
-      copyCheckedChildren: this.checkedChildren,
-      copyActionList: this.actionList,
-
+      pointEvent: this.readonly ? "none" : "inherit"
     };
   },
   methods: {
-    updateDataList() {
-      this.dataList = _.cloneDeep(this.children)
-    },
-    changeOptionsChecked() {
-      this.onSelectChange()
-    },
-    onSelectChange() {
-      this.$emit('on-select-change', this.copyCheckedChildren)
+    handleOnChange(val,item) {
+      item._checked = val
+      this.$emit("on-select-change", this.actionList);
     }
   }
 };

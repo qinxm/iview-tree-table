@@ -1,30 +1,23 @@
 <template>
-  <Checkbox :indeterminate="indeterminate_" 
-  :value="checked_" @on-change="handleOnChange" 
+  <Checkbox :indeterminate="indeterminate" 
+  :value="checked" @on-change="handleOnChange" 
   :style="{pointerEvents: pointEvent}"></Checkbox>
 </template>
 <script>
 export default {
   name: "checkboxCell",
   props: {
+    // 是否不确定
     indeterminate: false,
+    // 是否选中
     checked: false,
-    disabled: false
+    // 是否只读
+    readonly: false
   },
   data() {
     return {
-      pointEvent: this.disabled ? 'none' : 'inherit',
-      checked_: _.clone(this.checked),
-      indeterminate_: _.clone(this.indeterminate)
+      pointEvent: this.readonly ? 'none' : 'inherit',
     };
-  },
-  watch: {
-    checked() {
-      this.checked_ = _.clone(this.checked);
-    },
-    indeterminate() {
-      this.indeterminate_ = _.clone(this.indeterminate);
-    }
   },
   methods: {
     handleOnChange(val) {

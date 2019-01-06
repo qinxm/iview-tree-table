@@ -1,9 +1,9 @@
 <template>
   <div class="tree-container">
     <tree-table
-    :disabled="disabled"
-    :children="dataList"
-    @on-checked-keys-change="handleCheckedKeysChange"
+      :readonly="readonly"
+      :children="dataList"
+      @on-checked-keys-change="handleCheckedKeysChange"
     ></tree-table>
   </div>
 </template>
@@ -16,60 +16,108 @@ export default {
     TreeTable
   },
   props: {
-    disabled: Boolean,
-    dataList: Array
+    // 是否只读
+    readonly: {
+      type: Boolean,
+      default: false
+    },
+    // 数据
+    children: Array,
+    // 默认选择id列表
+    selectedList: Array,
+    // 展开所有节点
+    expandAll: {
+      type: Boolean,
+      default: true
+    },
+    expandLevel: {
+      type: Number,
+      default: 0
+    }
   },
   data() {
     return {
+      dataList: [],
       menuSet: new Set(),
-      roleMenuSet: new Set()
+      selectedSet: new Set()
+    };
+  },
+  created() {
+    if (this.children) {
+      // 将传入的数组转为Set类型
+      if (this.selectedList && this.selectedList.length) {
+        this.selectedSet = new Set(this.selectedList);
+      }
+      // 初始化数据
+      this.$set(
+        this,
+        "dataList",
+        this.resetDataList(this.formateData(this.children))
+      );
     }
   },
   methods: {
+    // 检验_checked是否选中
+    isChecked(id) {
+      return this.selectedSet && this.selectedSet.has(id);
+    },
     // 处理数据
-    updateDataList(dataList) {
+    formateData(dataList = [], level = 1) {
       return dataList.map(item => {
         let o = {};
         o.id = item.id;
         o.name = item.name;
         o._actionList = [];
         o._pageList = [];
-        o._checked = false;
-        item.children.map(obj => {
-          if (obj.type == "1") {
-            o._actionList.push({
+        o._checked = this.isChecked(item.id);
+        o.level = level;
+
+        Array.isArray(item.children) &&
+          item.children.map(obj => {
+            let a = {
               id: obj.id,
               name: obj.name,
-              _checked: false
-            });
+              _checked: this.isChecked(obj.id)
+            };
+            if (obj.type == "1") {
+              o._actionList.push({
+                ...a
+              });
+            }
+            if (obj.type == "0") {
+              o._pageList.push({
+                ...a,
+                children: obj.children
+              });
+            }
+          });
+        // 如果存在子页面, 则进行子页面遍历
+        if (o._pageList.length) {
+          o._expanded = this.expandAll;
+          // 展开层级
+          if (!this.expandAll && this.expandLevel && level <= this.expandLevel) {
+            o._expanded = true
           }
-          if (obj.type == "0") {
-            o._pageList.push({
-              id: obj.id,
-              name: obj.name,
-              _checked: false,
-              children: obj.children
-            });
-          }
-        });
-        o._pageList = item.children.filter(o => o.type == "0");
-        if (o._pageList && o._pageList.length > 0) {
-          o._pageList = this.updateDataList(o._pageList);
+          let pages = item.children.filter(o => o.type == "0");
+          o._pageList = this.formateData(pages, level + 1);
+        } else {
+          // 如果不存在子页面，则禁用当前行展开功能
+          o._disableExpand = true;
         }
         return o;
       });
     },
+    // 选择项发生改变
     handleCheckedKeysChange(dataList) {
       this.menuSet.clear();
-      this.roleMenuSet.clear();
-      this.dataList = dataList
-      this.resetDataList(this.dataList)
-      this.$emit('on-checked-keys-change', this.dataList, this.menuSet)
+      this.$set(this, "dataList", this.resetDataList(dataList));
+      this.$emit("on-checked-keys-change", this.dataList, this.menuSet);
     },
-    // 重置dataList的 _checked, _indeterminate 属性
+    // 重置dataList的 _checked, _indeterminate
     resetDataList(list) {
-      list.map(row => {
+      return list.map(row => {
         this.setRowAttributes(row);
+        return row;
       });
     },
     setRowAttributes(row) {
@@ -78,37 +126,16 @@ export default {
           this.setRowAttributes(p);
         });
       }
+      // 将子页面和子按钮放在一个数组中
       let children = row._pageList.concat(row._actionList);
 
-      // 如果已选择的角色存在，则选中
-      children.map(o => {
-        if (this.roleMenuSet.has(o.id)) {
-          o._checked = true;
-        }
-        return o;
-      });
-      // 遍历按钮 如果存在，则选中
-      let checkedChildren = [];
-      row._actionList.map(o => {
-        if (this.roleMenuSet.has(o.id)) {
-          checkedChildren.push(o.id);
-        }
-      });
-      if (checkedChildren.length) {
-        row._checkedChildren = checkedChildren;
-      }
+      // 无子页面 和 无子按钮
+      if (!children.length) return;
 
-      let childrenCount = children.length;
       let hasChildrenChecked = _.some(children, { _checked: true });
       let hasChildrenUnChecked = _.some(children, { _checked: false });
       let hasChildrenIndeterminate = _.some(children, { _indeterminate: true });
-      let hasChildrenUnIndeterminate = _.some(children, {
-        _indeterminate: false
-      });
-      // 无子页面 和 无子按钮
-      if (!childrenCount) {
-        return;
-      }
+
       // 子页面和子按钮 全选中
       if (
         hasChildrenChecked &&
@@ -118,21 +145,25 @@ export default {
         row._indeterminate = false;
         row._checked = true;
       } else if (!hasChildrenChecked) {
-        // 子页面和字按钮 都未选中
+        // 子页面和子按钮 都未选中
         row._indeterminate = false;
         row._checked = false;
       } else {
+        // 子页面或者子按钮 有选中情况
         row._indeterminate = true;
         row._checked = true;
       }
-      // 将所有选择的菜单ID添加到menuSet中
+      // 将所选择的菜单id和按钮id添加到menuSet中
       if (row._checked) {
-        _.filter(children, { _checked: true }).map(o => {
-          this.menuSet.add(o.id);
+        children.filter(item => {
+          if (item._checked) {
+            this.menuSet.add(item.id);
+          }
+          return item._checked;
         });
         this.menuSet.add(row.id);
       }
-    },
-  },
+    }
+  }
 };
 </script>

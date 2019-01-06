@@ -2,44 +2,4 @@
     td.ivu-table-expanded-cell {
       padding: 5px 0 5px 10px;
     }
-    .ivu-table-cell {
-      font-size: 14px !important;
-      color: #2f324d;
-    }
-    .role-checkbox {
-      display: inline-block;
-      margin-right: 10px;
-    }
-    .role-options {
-      padding: 5px;
-      &:first-child {
-        margin-top: 0;
-      }
-  
-      &-name {
-        width: 150px;
-        height: 30px;
-        line-height: 30px;
-        color: #2f324d;
-        .ivu-checkbox-wrapper {
-          font-size: 14px;
-        }
-        position: relative;
-      }
-      &-options {
-        flex: 1;
-      }
-      &-expand-icon {
-        display: inline-block;
-        font-size: 14px;
-        margin-right: 10px;
-        position: absolute;
-        left: -24px;
-      }
-    }
-    .role-expand-hide {
-      .ivu-table-cell-with-expand {
-        display: none;
-      }
-    }
   }
