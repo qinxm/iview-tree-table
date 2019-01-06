@@ -1,5 +1,7 @@
-# iview-tree-table
+# iview-tree-table 
+浏览地址：http://180.76.157.124:8081/iviewtreetable/index.html
 ```
+
 基于iview 组件库的table实现的树级table, 可用于权限控制页面的菜单和按钮选择。
 ```
 
