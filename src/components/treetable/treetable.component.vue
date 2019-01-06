@@ -1,3 +1,4 @@
+ /* eslint-disable */ 
 <template>
   <div>
     <Table
@@ -138,7 +139,8 @@ export default {
     },
     // 设置menuList的值
     setDataList(row) {
-      let rowIndex = _.findIndex(this.dataList, o => o.id == row.id);
+      // 找到当前行索引
+      let rowIndex = this.dataList.findIndex((obj) => obj.id == row.id)
       this.$set(this.dataList, rowIndex, row);
       this.toEmit();
     }

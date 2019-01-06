@@ -1,3 +1,4 @@
+ /* eslint-disable */
 <template>
   <div class="pd10">
     <div class="pd10 alignl">
@@ -15,66 +16,73 @@
           </i-switch>
         </FormItem>
         <FormItem label="展开层级">
-          <InputNumber :max="3" :min="1" v-model="expandLevel" @on-change="changLevel"></InputNumber>
+          <InputNumber :max="3" :min="0" v-model="expandLevel" @on-change="changLevel"></InputNumber>
         </FormItem>
       </Form>
     </div>
-    <tree-table
-    v-if="isRefresh"
-    :readonly="readonly"
-    :children="dataList"
-    :selectedList="initSelected"
-    :expandAll="expandAll"
-    :expandLevel="expandLevel"
-    @on-checked-keys-change="handleCheckedKeysChange"
-    ></tree-table>
+    <iview-tree-table
+      v-if="isRefresh"
+      :readonly="readonly"
+      :children="dataList"
+      :selectedList="initSelected"
+      :expandAll="expandAll"
+      :expandLevel="expandLevel"
+      @on-checked-keys-change="handleCheckedKeysChange"
+    ></iview-tree-table>
   </div>
 </template>
 <script>
-import TreeTable from "@/components/treetable/index.component.vue";
-import mockData from './mock.js'
+import IviewTreeTable from "@/components/treetable/index.component.vue";
+import mockData from "./mock.js";
 export default {
   name: "Index",
   components: {
-    TreeTable
+    IviewTreeTable
   },
   data() {
     return {
       isRefresh: true,
       readonly: false,
       expandAll: false,
-      expandLevel: 1,
+      expandLevel: 0,
       dataList: [],
-      menuSet: new Set(),
-      initSelected: [ 1077, 749, 10000]
-    }
+      // 初始化选中的菜单和按钮id
+      initSelected: [1077, 749, 10000]
+    };
   },
   created() {
-    this.dataList = mockData
+    this.dataList = mockData;
   },
   methods: {
     refresh() {
-      this.isRefresh= false;
+      this.isRefresh = false;
       this.$nextTick(() => {
-        this.isRefresh = true
-      })
+        this.isRefresh = true;
+      });
     },
     changLevel(val) {
-      this.expandAll = false
+      console.log(val);
+      this.expandAll = false;
       this.refresh();
     },
+    /**
+     * 按钮选中后触发该事件
+     * dataList: 绑定的数据源
+     * menuSet: 包含所有选中的菜单和按钮id
+     */
     handleCheckedKeysChange(dataList, menuSet) {
-      console.log(dataList)
+      console.log(dataList);
+      console.log(menuSet);
     }
-  },
+  }
 };
 </script>
 <style>
-  .alignl {
-    text-align: left;
-  }
-  .pd10 {
-    padding: 10px;
-  }
+.alignl {
+  text-align: left;
+}
+.pd10 {
+  padding: 10px;
+}
 </style>
 

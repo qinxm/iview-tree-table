@@ -1,3 +1,5 @@
+ /* eslint-disable */ 
+
 <template>
   <div class="tree-container">
     <tree-table
@@ -128,6 +130,9 @@ export default {
       }
       // 将子页面和子按钮放在一个数组中
       let children = row._pageList.concat(row._actionList);
+      if (row._checked) {
+        this.menuSet.add(row.id);
+      }
 
       // 无子页面 和 无子按钮
       if (!children.length) return;
@@ -155,13 +160,11 @@ export default {
       }
       // 将所选择的菜单id和按钮id添加到menuSet中
       if (row._checked) {
-        children.filter(item => {
+        children.forEach(item => {
           if (item._checked) {
             this.menuSet.add(item.id);
           }
-          return item._checked;
         });
-        this.menuSet.add(row.id);
       }
     }
   }

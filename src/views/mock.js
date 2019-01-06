@@ -1,7 +1,6 @@
 export default [
   {
     id: 10000,
-    parentId: -1,
     children: [
       {
         id: 10001,
@@ -121,7 +120,7 @@ export default [
     type: "0"
   },
   {
-    id: 2002,
+    id: 20000,
     name: '一级菜单2',
     type: "0"
   }
