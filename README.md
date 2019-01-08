@@ -1,6 +1,7 @@
 # iview-tree-table
 ```
-基于iview 组件库的table实现的树级table, 可用于权限控制页面的菜单和按钮选择。
+1. 基于iview 组件库的table实现的树级table, 可用于权限控制页面的菜单和按钮选择。
+2. 扩展iview tree 组件，增加设置默认节点选中功能，和清空选项功能。
 ```
 
 ## Project setup
@@ -20,8 +21,7 @@ npm run build
 
 ### Use
 ```
-npm install iview-tree-table -S
-
+1. tree-table
 <tree-table
     :readonly="readonly"
     :children="dataList"
@@ -62,5 +62,36 @@ methods: {
     }
 }
    
+2. QTree 扩展iview tree
+  <q-tree ref="Qtree" :data="dataList" showCheckbox titleKey="name" :selectIds="selectIds"></q-tree>
 
+  components: {
+    QTree
+  },
+  data() {
+    return {
+      dataList: [],
+      selectIds: ["1064", "1065"]
+    };
+  },
+  created() {
+    this.dataList = mockData;
+  },
+  methods: {
+    setCheckedNodes() {
+      this.$refs["Qtree"].setCheckedNodes(this.selectIds);
+    },
+    getSelectedNodes() {
+      console.log(this.$refs["Qtree"].getSelectedNodes());
+    },
+    getCheckedNodes() {
+      console.log(this.$refs["Qtree"].getCheckedNodes());
+    },
+    getCheckedAndIndeterminateNodes() {
+      console.log(this.$refs["Qtree"].getCheckedAndIndeterminateNodes());
+    },
+    clearAll() {
+      this.$refs["Qtree"].clearAll();
+    }
+  }
 ```
