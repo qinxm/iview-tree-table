@@ -22,7 +22,6 @@ npm run build
 
 ### Use
 ```
-npm install iview-tree-table -S
 
 <tree-table
     :readonly="readonly"
