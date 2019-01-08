@@ -1,7 +1,9 @@
-# iview-tree-table
+# iview-tree-table 
+浏览地址：http://180.76.157.124:8081/iviewtreetable/index.html
 ```
 1. 基于iview 组件库的table实现的树级table, 可用于权限控制页面的菜单和按钮选择。
 2. 扩展iview tree 组件，增加设置默认节点选中功能，和清空选项功能。
+
 ```
 
 ## Project setup
@@ -21,7 +23,6 @@ npm run build
 
 ### Use
 ```
-1. tree-table
 <tree-table
     :readonly="readonly"
     :children="dataList"
