@@ -34,7 +34,7 @@
       :selectAll="selectAll"
       :readonly="readonly"
       :children="dataList"
-      :selectedList="initSelected"
+      :selectedList="selectMenuSet"
       :expandAll="expandAll"
       :expandLevel="expandLevel"
       @on-checked-keys-change="handleCheckedKeysChange"

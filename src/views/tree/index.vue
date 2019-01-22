@@ -7,9 +7,9 @@
       <Button type="primary" @click="getSelectedNodes">获取选择节点</Button>
       <Button type="primary" @click="clearAll">清空</Button>
     </div>
-    <p>打开控制台查看输出</p>
-    <div class="mgt10 ">
-      <q-tree ref="Qtree" :data="dataList" showCheckbox titleKey="name" :selectIds="selectIds"></q-tree>
+    <Tag color="error">打开控制台查看输出</Tag>
+    <div class="mgt10 alignc">
+      <q-tree ref="Qtree" :dataSource="dataList" showCheckbox titleKey="name" :targetIds="selectIds"></q-tree>
     </div>
   </div>
 </template>

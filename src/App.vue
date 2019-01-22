@@ -39,4 +39,10 @@ export default {
 .mgt10 {
   margin-top: 10px;
 }
+.alignl {
+  text-align: left;
+}
+.alignc {
+  text-align: center;
+}
 </style>

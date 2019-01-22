@@ -2,7 +2,16 @@
 
 <template>
   <div class="tree-container">
+    <Search
+      prefix-cls="tree-search"
+      :query="query"
+      :searchLabel="searchLabel"
+      @on-query-clear="handleQueryClear"
+      @on-query-change="handleQueryChange"
+      :placeholder="filterPlaceholder"
+    ></Search>
     <tree-table
+      v-if="showTree"
       :readonly="readonly"
       :children="dataList"
       @on-checked-keys-change="handleCheckedKeysChange"
@@ -11,11 +20,12 @@
 </template>
 <script>
 import TreeTable from "./treetable.component.vue";
-
+import Search from "../search/search.component.vue";
 export default {
   name: "TreeTableIndex",
   components: {
-    TreeTable
+    TreeTable,
+    Search
   },
   props: {
     selectAll: {
@@ -39,34 +49,57 @@ export default {
     expandLevel: {
       type: Number,
       default: 0
+    },
+    // 搜索框label
+    searchLabel: {
+      type: String,
+      default: ""
+    },
+    // 搜索框关键字
+    filterPlaceholder: {
+      type: String,
+      default: "请输入关键字进行过滤"
     }
   },
   data() {
     return {
       dataList: [],
+      showTree: true,
       menuSet: new Set(),
-      selectedSet: new Set()
+      selectedSet: new Set(),
+      query: ''
     };
   },
   created() {
-    if (this.children) {
-      // 将传入的数组转为Set类型
-      if (this.selectedList && this.selectedList.length) {
-        this.selectedSet = new Set(this.selectedList);
-      }
-      // 初始化数据
-      this.$set(
-        this,
-        "dataList",
-        this.resetDataList(this.formateData(this.children))
-      );
-      this.$emit("on-checked-keys-change", this.dataList, this.menuSet);
-    }
+    this.handleTree()
   },
   methods: {
+    handleTree() {
+      if (this.children) {
+        // 将传入的数组转为Set类型
+        if (this.selectedList && this.selectedList.length) {
+          this.selectedSet = new Set(this.selectedList);
+        }
+        // 初始化数据
+        this.$set(
+          this,
+          "dataList",
+          this.resetDataList(this.formateData(this.children))
+        );
+        this.$emit("on-checked-keys-change", this.dataList, this.menuSet);
+      }
+    },
     // 检验_checked是否选中
     isChecked(id) {
       return (this.selectedSet && this.selectedSet.has(id)) || this.selectAll;
+    },
+    // 判断该节点是否需要展开
+    isMatchFilter(title) {
+      if (title && this.query && title.indexOf(this.query) > -1) {
+        return true
+      } else {
+        return false
+      }
     },
     // 处理数据
     formateData(dataList = [], level = 1) {
@@ -78,13 +111,15 @@ export default {
         o._pageList = [];
         o._checked = this.isChecked(item.id);
         o.level = level;
-
+        o._matched = this.isMatchFilter(o.name)
         Array.isArray(item.children) &&
           item.children.map(obj => {
+            debugger
             let a = {
               id: obj.id,
               name: obj.name,
-              _checked: this.isChecked(obj.id)
+              _checked: this.isChecked(obj.id),
+              _matched: this.isMatchFilter(obj.name)
             };
             if (obj.type == "1") {
               o._actionList.push({
@@ -104,13 +139,33 @@ export default {
           // 展开层级
           if (!this.expandAll && this.expandLevel && level <= this.expandLevel) {
             o._expanded = true
+          } 
+          let hasActionMatched = o._actionList.some(obj => obj._matched);
+          let hasPageMatched = o._pageList.some(obj => obj._matched);
+          
+          if (o.name =='四级菜单1111') {
+            debugger
           }
+          o._matched = o._matched || hasActionMatched || hasPageMatched;
+          
+          
+
           let pages = item.children.filter(o => o.type == "0");
           o._pageList = this.formateData(pages, level + 1);
+
+         
+
         } else {
           // 如果不存在子页面，则禁用当前行展开功能
           o._disableExpand = true;
         }
+
+        if (!o._expanded) {
+          o._matched  = o._matched || o._actionList.some(obj => obj._matched ) ||  o._pageList.some(obj => obj._matched )
+          if (o._pageList.length) {
+            o._expanded = o._matched
+          }
+        } 
         return o;
       });
     },
@@ -119,6 +174,8 @@ export default {
       this.menuSet.clear();
       this.$set(this, "dataList", this.resetDataList(dataList));
       this.$emit("on-checked-keys-change", this.dataList, this.menuSet);
+      this.selectedSet = this.menuSet
+      
     },
     // 重置dataList的 _checked, _indeterminate
     resetDataList(list) {
@@ -145,9 +202,9 @@ export default {
         return
       };
 
-      let hasChildrenChecked = children.some((obj)=>  obj._checked);
-      let hasChildrenUnChecked = children.some((obj)=>  !obj._checked);
-      let hasChildrenIndeterminate = children.some((obj)=>  obj._indeterminate);
+      let hasChildrenChecked = children.some((obj) =>  obj._checked);
+      let hasChildrenUnChecked = children.some((obj) =>  !obj._checked);
+      let hasChildrenIndeterminate = children.some((obj) =>  obj._indeterminate);
 
       // 子页面和子按钮 全选中
       if (
@@ -175,6 +232,15 @@ export default {
         });
         this.menuSet.add(row.id);
       }
+    },
+    handleQueryClear() {
+
+    },
+    handleQueryChange(val) {
+      this.showTree = false
+      this.query = val;
+      this.handleTree()
+      this.showTree = true
     }
   }
 };
